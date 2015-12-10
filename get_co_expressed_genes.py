@@ -11,8 +11,6 @@ A script designed to find all clusters that contain any gene of interest.
                 [2] Path leading to a new-line delimited file containing the genes of interest.
                 [3] Path leading to output file, which mirrors the structure of the cluster file.
 
-    Outputs:    [1] Single File, containing the co-expressed clusters and their genes.
-
 In order to provide readable and understandable code, the right indentation margin has been
 increased from 79 to 99 characters, which remains in line with Python-Style-Recommendation (
 https://www.python.org/dev/peps/pep-0008/) .This allows for longer, more descriptive variable
@@ -58,19 +56,20 @@ def check_gene_presence(gene_list, genes):
     return False
 
 
-def get_genes_from_file(gene_file):
+def get_genes_from_file(gene_file, column):
     """
     Function to create a list of strings containing the contents of a new-line delimited file
     containing the genes of interest.
 
     :param gene_file: A string specifying the name of the new-line delimited file containing the
     genes of interest
+    :param column: The column containing the gene codes/names of interest.
     :return: A list of strings containing the genes of the input file.
     """
     genes = []
     with open(gene_file, 'r') as input_file:
         for line in input_file:
-            genes.append(line.strip())
+            genes.append(line.strip().split('\t')[column])
     return genes
 
 
@@ -78,12 +77,12 @@ def main():
     """
     Method to find all co-expressed clusters and their genes.
     """
-    cluster_file, gene_file, output_file = get_command_line_arguments(['testing_cluster.txt',
-                                                                       'testing_genes.txt',
-                                                                       'testing_output.txt'])
+    cluster_file, gene_file, column, output_file = get_command_line_arguments(
+        ['testing_cluster.txt', 'testing_genes.txt', '0', 'testing_output.txt'])
     assert os.path.exists(cluster_file), 'Cluster file %s does not exist.' % cluster_file
     assert os.path.exists(gene_file), 'Gene file %s does not exist.' % gene_file
-    genes = get_genes_from_file(gene_file)
+    column = int(column)
+    genes = get_genes_from_file(gene_file, column)
     find_co_expression_clusters(cluster_file, genes, output_file)
 
 
